@@ -1,0 +1,38 @@
+---
+title: "Crow Fault Bars"
+author: "Justin Mann"
+date: "2024-10-04"
+output: html_document
+---
+
+```{r libraries}
+library(tidyverse)
+library(lme4)
+library(AER)
+```
+
+
+```{r import data}
+fb.df <- read.csv("FaultBarData.csv", h=T)
+fb.df$Length <- as.numeric(fb.df$Length)
+fb.df$Habitat <- as.factor(fb.df$Habitat)
+fb.df <- fb.df %>% drop_na(Habitat, Length)
+```
+
+
+```{r Length Scatter Plot}
+plot(fb.df$Length)
+```
+
+```{r Length Histogram}
+hist(fb.df$Length)
+```
+
+
+
+```{r}
+length.mdl <- glm(Length ~ Habitat, family = "gaussian",data = fb.df)
+summary(length.mdl)
+```
+
+
