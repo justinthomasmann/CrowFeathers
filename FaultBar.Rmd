@@ -8,7 +8,10 @@ output: html_document
 ```{r libraries}
 library(tidyverse)
 library(lme4)
-library(AER)
+library(nnet)
+library(broom)
+library(glmmTMB)
+library(MCMCglmm)
 ```
 
 
@@ -16,11 +19,14 @@ library(AER)
 fb.df <- read.csv("FaultBarData.csv", h=T)
 fb.df$Length <- as.numeric(fb.df$Length)
 fb.df$Habitat <- as.factor(fb.df$Habitat)
-fb.df <- fb.df %>% drop_na(Habitat, Length)
+fb.df <- fb.df %>% drop_na(Grade, Habitat, Length)
+fb.df$Grade <- as.factor(fb.df$Grade)
+fb.df$Feather <- as.factor(fb.df$Feather)
 ```
 
 
 ```{r Length Scatter Plot}
+range(fb.df$Length)
 plot(fb.df$Length)
 ```
 
@@ -28,11 +34,28 @@ plot(fb.df$Length)
 hist(fb.df$Length)
 ```
 
-
+```{r scaling length}
+fb.df$LengthScaled <- scale(fb.df$Length)
+```
 
 ```{r}
-length.mdl <- glm(Length ~ Habitat, family = "gaussian",data = fb.df)
+hist(fb.df$LengthScaled)
+```
+
+
+```{r length.mdl}
+length.mdl <- lmer(LengthScaled ~  Habitat + (1|Feather), data = fb.df)
 summary(length.mdl)
 ```
 
+```{r residual distribution}
+hist(residuals(length.mdl))
+```
+
+
+```{r grade.mdl}
+grade.mdl <- nnet::multinom(Grade ~  Habitat, data = fb.df)
+summary(grade.mdl)
+broom::tidy(grade.mdl)
+```
 
