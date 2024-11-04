@@ -76,24 +76,103 @@ sum(fbs.df$LightBars[fbs.df$Habitat=="rural"]) #300 rural light bars
 
 
 ```{r}
-summary(glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1,family = "poisson"))
-```
-
-```{r}
-summary(glm(data = fbs.df, MediumBars ~ Habitat, family = "poisson"))
+summary(lm(data = fbs.df, LightBars ~ Habitat))
 ```
 
 
 ```{r}
-summary(glm(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
+summary(lm(data = fbs.df, LightBars ~ Habitat))
+```
+
+```{r}
+light.poisson.mdl <- (glm(data = fbs.df, LightBars ~ Habitat, family = "poisson"))
+summary(light.poisson.mdl)
+```
+
+
+```{r zero inflation test}
+#zero inflation test from: http://data.princeton.edu/wws509/r/overdispersion.html 
+zobs <- fbs.df$LightBars == 0
+zpoi <- exp(-exp(predict(light.poisson.mdl)))
+c(obs=mean(zobs), poi = mean(zpoi))
+```
+
+
+
+```{r}
+summary(glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
 
 ```{r}
-summary(lm(data = fbs.df, BarsTotal ~ Habitat))
+theme_set(theme_classic())
+mean(fbs.df$LightBars[fbs.df$Habitat=="urban"])
+mean(fbs.df$LightBars[fbs.df$Habitat=="rural"])
+
+Habitat <- c("Urban", "Rural")
+Means <- c(2.27, 3.3)
+HabitatMeans <- data.frame(Habitat,Means)
+
+LightBarDensity.plot <- ggplot(fbs.df, aes(x=LightBars, fill = Habitat))+
+  geom_density(alpha=0.5)+
+  geom_vline(data = HabitatMeans, aes(xintercept = Means, color=Habitat),
+             linetype="dashed",
+             size = 1,
+             show.legend = FALSE)+
+  scale_fill_manual(values = c("#D95F02", "#1B9E77"))
+
+LightBarDensity.plot
 ```
 
 
+
+```{r}
+
+sum(fbs.df$MediumBars[fbs.df$Habitat=="urban"])
+sum(fbs.df$MediumBars[fbs.df$Habitat=="rural"])
+
+summary(glmmTMB(data = fbs.df, MediumBars ~ Habitat, ziformula=~1, family = "poisson"))
+```
+
+
+```{r}
+summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
+```
+
+
+```{r}
+summary(glmmTMB(data = fbs.df, BarsTotal ~ Habitat, ziformula = ~1, family = "poisson"))
+```
+
+
+```{r}
+mean(fbs.df$BarsTotal[fbs.df$Habitat=="urban"])
+mean(fbs.df$BarsTotal[fbs.df$Habitat=="rural"])
+
+TotHabitat <- c("Urban", "Rural")
+TotMeans <- c(3.83, 5.42)
+TotHabitatMeans <- data.frame(TotHabitat,TotMeans)
+
+TotalBarDensity.plot <- ggplot(fbs.df, aes(x=BarsTotal, fill = Habitat))+
+  geom_density(alpha=0.5)+
+  geom_vline(data = HabitatMeans, aes(xintercept = TotMeans, color=TotHabitat),
+             linetype="dashed",
+             size = 1,
+             show.legend = FALSE)+
+  scale_fill_manual(values = c("#D95F02", "#1B9E77"))
+
+TotalBarDensity.plot
+```
+
+#1. Restrict by feather type
+#  - Total fault bars
+#  - Medium fault bars
+
+#2. Combine light and medium fault bars
+
+#3. Feather weight by Habitat for feather type
+
+#4. Length of fault bar by Habitat
 ```{r}
 summary(lm(data = fbs.df, DamageScore ~ Habitat))
 ```
