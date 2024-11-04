@@ -15,7 +15,7 @@ library(MCMCglmm)
 ```
 
 
-```{r import data}
+```{r import longform data}
 fb.df <- read.csv("FaultBarData.csv", h=T)
 fb.df$Length <- as.numeric(fb.df$Length)
 fb.df$Habitat <- as.factor(fb.df$Habitat)
@@ -57,5 +57,69 @@ hist(residuals(length.mdl))
 grade.mdl <- nnet::multinom(Grade ~  Habitat, data = fb.df)
 summary(grade.mdl)
 broom::tidy(grade.mdl)
+```
+
+
+```{r import short form data}
+fbs.df <- read.csv("FeatherMaster_1Nov24.csv", h=T)
+fbs.df <- fbs.df[,1:15]
+fbs.df$ID <- as.factor(fbs.df$ID)
+n_occur <- data.frame(table(fbs.df$ID))
+n_occur[n_occur$Freq > 1,]#no repeat IDs
+```
+
+
+```{r}
+sum(fbs.df$LightBars[fbs.df$Habitat=="urban"]) #200 urban light bars
+sum(fbs.df$LightBars[fbs.df$Habitat=="rural"]) #300 rural light bars
+```
+
+
+```{r}
+summary(glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1,family = "poisson"))
+```
+
+```{r}
+summary(glm(data = fbs.df, MediumBars ~ Habitat, family = "poisson"))
+```
+
+
+```{r}
+summary(glm(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
+```
+
+
+```{r}
+summary(lm(data = fbs.df, BarsTotal ~ Habitat))
+```
+
+
+```{r}
+summary(lm(data = fbs.df, DamageScore ~ Habitat))
+```
+
+
+```{r}
+summary(lm(data = fbs.df, LightLength ~ Habitat))
+```
+
+
+```{r}
+summary(lm(data = fbs.df, MediumLength ~ Habitat))
+```
+
+
+```{r}
+summary(lm(data = fbs.df, StrongLength ~ Habitat))
+```
+
+
+```{r}
+fbs.prim.df <- subset(fbs.df, Type == "primary")
+```
+
+
+```{r}
+summary(lm(data = fbs.prim.df, LightBars ~ Habitat))
 ```
 
