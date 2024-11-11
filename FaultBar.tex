@@ -1,0 +1,730 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Crow Fault Bars},
+  pdfauthor={Justin Mann},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Crow Fault Bars}
+\author{Justin Mann}
+\date{2024-10-04}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.1
+## v ggplot2   3.5.1     v tibble    3.2.1
+## v lubridate 1.9.3     v tidyr     1.3.1
+## v purrr     1.0.2     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: Matrix
+## 
+## Attaching package: 'Matrix'
+## 
+## The following objects are masked from 'package:tidyr':
+## 
+##     expand, pack, unpack
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(nnet)}
+\FunctionTok{library}\NormalTok{(broom)}
+\FunctionTok{library}\NormalTok{(glmmTMB)}
+\FunctionTok{library}\NormalTok{(MCMCglmm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: coda
+## Loading required package: ape
+## 
+## Attaching package: 'ape'
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     where
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{theme\_set}\NormalTok{(}\FunctionTok{theme\_classic}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fb.df }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"FaultBarData.csv"}\NormalTok{, }\AttributeTok{h=}\NormalTok{T)}
+\NormalTok{fb.df}\SpecialCharTok{$}\NormalTok{Length }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Length)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introduced by coercion
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fb.df}\SpecialCharTok{$}\NormalTok{Habitat }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Habitat)}
+\NormalTok{fb.df }\OtherTok{\textless{}{-}}\NormalTok{ fb.df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{drop\_na}\NormalTok{(Grade, Habitat, Length)}
+\NormalTok{fb.df}\SpecialCharTok{$}\NormalTok{Grade }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Grade)}
+\NormalTok{fb.df}\SpecialCharTok{$}\NormalTok{Feather }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Feather)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{range}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Length)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1]  0.89 39.87
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Length)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FaultBar_files/figure-latex/Length Scatter Plot-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Length)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FaultBar_files/figure-latex/Length Histogram-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fb.df}\SpecialCharTok{$}\NormalTok{LengthScaled }\OtherTok{\textless{}{-}} \FunctionTok{scale}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{Length)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(fb.df}\SpecialCharTok{$}\NormalTok{LengthScaled)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FaultBar_files/figure-latex/fb length scaled histogram-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fbs.df }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"FeatherMaster\_1Nov24.csv"}\NormalTok{, }\AttributeTok{h=}\NormalTok{T)}
+\NormalTok{fbs.df }\OtherTok{\textless{}{-}}\NormalTok{ fbs.df[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{15}\NormalTok{]}
+\NormalTok{fbs.df}\SpecialCharTok{$}\NormalTok{ID }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{ID)}
+\NormalTok{n\_occur }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{table}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{ID))}
+\NormalTok{n\_occur[n\_occur}\SpecialCharTok{$}\NormalTok{Freq }\SpecialCharTok{\textgreater{}} \DecValTok{1}\NormalTok{,]}\CommentTok{\#no repeat IDs}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] Var1 Freq
+## <0 rows> (or 0-length row.names)
+\end{verbatim}
+
+\subsubsection{Sums of light fault bars in urban and rural
+habitats}\label{sums-of-light-fault-bars-in-urban-and-rural-habitats}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{LightBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"urban"}\NormalTok{]) }\CommentTok{\#200 urban light bars}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 200
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{LightBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"rural"}\NormalTok{]) }\CommentTok{\#300 rural light bars}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 300
+\end{verbatim}
+
+\subsubsection{Gausian linear model for light fault
+bars.}\label{gausian-linear-model-for-light-fault-bars.}
+
+This model uses a Gaussian probability distribution which is not
+appropriate for count data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, LightBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = LightBars ~ Habitat, data = fbs.df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.2967 -2.2727 -1.2967  0.7273 16.7273 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)    3.2967     0.3967   8.311 2.42e-14 ***
+## Habitaturban  -1.0240     0.5657  -1.810    0.072 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.784 on 177 degrees of freedom
+## Multiple R-squared:  0.01817,    Adjusted R-squared:  0.01262 
+## F-statistic: 3.276 on 1 and 177 DF,  p-value: 0.072
+\end{verbatim}
+
+\subsubsection{Poisson model for light fault
+bars.}\label{poisson-model-for-light-fault-bars.}
+
+This model uses the poisson probability distribution which is
+appropriate for count data. There are significantly fewer light fault
+bars in the urban habitat.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{light.poisson.mdl }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{glm}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, LightBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\FunctionTok{summary}\NormalTok{(light.poisson.mdl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = LightBars ~ Habitat, family = "poisson", data = fbs.df)
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.19292    0.05774  20.662  < 2e-16 ***
+## Habitaturban -0.37194    0.09129  -4.074 4.61e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 817.50  on 178  degrees of freedom
+## Residual deviance: 800.57  on 177  degrees of freedom
+## AIC: 1139.7
+## 
+## Number of Fisher Scoring iterations: 6
+\end{verbatim}
+
+\subsubsection{Zero inflation test}\label{zero-inflation-test}
+
+This code confirms that the data are zero inflated. The output states
+that \textasciitilde40\% of the observed data are zeros, while the
+poisson model only expects \textasciitilde7\% of the data points to be
+zeros.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#zero inflation test from: http://data.princeton.edu/wws509/r/overdispersion.html }
+\NormalTok{zobs }\OtherTok{\textless{}{-}}\NormalTok{ fbs.df}\SpecialCharTok{$}\NormalTok{LightBars }\SpecialCharTok{==} \DecValTok{0}
+\NormalTok{zpoi }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{exp}\NormalTok{(}\FunctionTok{predict}\NormalTok{(light.poisson.mdl)))}
+\FunctionTok{c}\NormalTok{(}\AttributeTok{obs=}\FunctionTok{mean}\NormalTok{(zobs), }\AttributeTok{poi =} \FunctionTok{mean}\NormalTok{(zpoi))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        obs        poi 
+## 0.39664804 0.06946459
+\end{verbatim}
+
+\subsubsection{Zero-inflated poisson
+model}\label{zero-inflated-poisson-model}
+
+This model accounts for the zero inflated data. There are still
+significantly fewer light fault bars in the urban habitat.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, LightBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{ziformula =} \SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          LightBars ~ Habitat
+## Zero inflation:             ~1
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    882.9    892.5   -438.5    876.9      176 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.63818    0.05851  27.997  < 2e-16 ***
+## Habitaturban -0.27489    0.09436  -2.913  0.00358 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Zero-inflation model:
+##             Estimate Std. Error z value Pr(>|z|)   
+## (Intercept)  -0.4537     0.1562  -2.905  0.00368 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\subsubsection{Light fault bar density
+plot}\label{light-fault-bar-density-plot}
+
+This plot shows the frequency of light fault bar numbers per feather in
+the urban and rural samples. The dotted lines are the habitat means.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{LightBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"urban"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2.272727
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{LightBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"rural"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3.296703
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Habitat }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Urban"}\NormalTok{, }\StringTok{"Rural"}\NormalTok{)}
+\NormalTok{Means }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{2.27}\NormalTok{, }\FloatTok{3.3}\NormalTok{)}
+\NormalTok{HabitatMeans }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(Habitat,Means)}
+
+\NormalTok{LightBarDensity.plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(fbs.df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{LightBars, }\AttributeTok{fill =}\NormalTok{ Habitat))}\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ HabitatMeans, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ Means, }\AttributeTok{color=}\NormalTok{Habitat),}
+             \AttributeTok{linetype=}\StringTok{"dashed"}\NormalTok{,}
+             \AttributeTok{size =} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"\#D95F02"}\NormalTok{, }\StringTok{"\#1B9E77"}\NormalTok{))}\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Frequency"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Number of light fault bars"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## i Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LightBarDensity.plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FaultBar_files/figure-latex/light fb density plot-1.pdf}
+
+\subsubsection{Sum of medium fault bars in urban and rural
+habitats}\label{sum-of-medium-fault-bars-in-urban-and-rural-habitats}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{MediumBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"urban"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 114
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{MediumBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"rural"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 181
+\end{verbatim}
+
+\subsubsection{Poisson model for medium fault
+bars}\label{poisson-model-for-medium-fault-bars}
+
+This model shows significantly fewer medium fault bars in the urban
+habitat
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, MediumBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          MediumBars ~ Habitat
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    928.9    935.3   -462.4    924.9      177 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   0.68764    0.07433   9.251  < 2e-16 ***
+## Habitaturban -0.42878    0.11957  -3.586 0.000336 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\subsubsection{Zero-inflated poisson model for medium fault
+bars}\label{zero-inflated-poisson-model-for-medium-fault-bars}
+
+For some unknown reason, this model no longer shows a significant
+relationship. NEED TO INVESTIGATE!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, MediumBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{ziformula=}\SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          MediumBars ~ Habitat
+## Zero inflation:              ~1
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    725.4    735.0   -359.7    719.4      176 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.26600    0.07715  16.410   <2e-16 ***
+## Habitaturban -0.04576    0.12817  -0.357    0.721    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Zero-inflation model:
+##             Estimate Std. Error z value Pr(>|z|)
+## (Intercept)   0.1078     0.1550   0.695    0.487
+\end{verbatim}
+
+\subsubsection{Sum of strong fault bars in urban and rural
+habitats}\label{sum-of-strong-fault-bars-in-urban-and-rural-habitats}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{StrongBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"urban"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 23
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{StrongBars[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"rural"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 12
+\end{verbatim}
+
+\subsubsection{Poisson model for strong fault
+bars}\label{poisson-model-for-strong-fault-bars}
+
+This model shows a trend towards more strong fault bars in the urban
+habitat, but the relationship is non significant. The proportional
+difference is similar, but the strong bar sample is smaller.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, StrongBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          StrongBars ~ Habitat
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    204.8    211.2   -100.4    200.8      177 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   -2.0260     0.2887  -7.018 2.25e-12 ***
+## Habitaturban   0.6841     0.3561   1.921   0.0547 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\subsubsection{Zero-inflated poisson model for strong fault
+bars}\label{zero-inflated-poisson-model-for-strong-fault-bars}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, StrongBars }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{ziformula =} \SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          StrongBars ~ Habitat
+## Zero inflation:              ~1
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    182.9    192.5    -88.4    176.9      176 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)
+## (Intercept)   -0.3199     0.4577  -0.699    0.485
+## Habitaturban   0.4155     0.4657   0.892    0.372
+## 
+## Zero-inflation model:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.3304     0.3414   3.897 9.74e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\subsubsection{Zero-inflated poisson model for total number of fault
+bars}\label{zero-inflated-poisson-model-for-total-number-of-fault-bars}
+
+Overall, there are significantly fewer total fault bars in the urban
+habitat sample.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{glmmTMB}\NormalTok{(}\AttributeTok{data =}\NormalTok{ fbs.df, BarsTotal }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Habitat, }\AttributeTok{ziformula =} \SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{family =} \StringTok{"poisson"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          BarsTotal ~ Habitat
+## Zero inflation:             ~1
+## Data: fbs.df
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##   1332.7   1342.2   -663.3   1326.7      176 
+## 
+## 
+## Conditional model:
+##              Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   1.89553    0.04517   41.96  < 2e-16 ***
+## Habitaturban -0.19189    0.07142   -2.69  0.00722 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Zero-inflation model:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  -1.1334     0.1752  -6.468 9.96e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\subsubsection{Total fault bar density
+plot}\label{total-fault-bar-density-plot}
+
+This plot shows the frequency of total fault bar numbers per feather in
+the urban and rural samples. The dotted lines are the habitat means.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{BarsTotal[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"urban"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3.829545
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(fbs.df}\SpecialCharTok{$}\NormalTok{BarsTotal[fbs.df}\SpecialCharTok{$}\NormalTok{Habitat}\SpecialCharTok{==}\StringTok{"rural"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5.417582
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TotHabitat }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Urban"}\NormalTok{, }\StringTok{"Rural"}\NormalTok{)}
+\NormalTok{TotMeans }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{3.83}\NormalTok{, }\FloatTok{5.42}\NormalTok{)}
+\NormalTok{TotHabitatMeans }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(TotHabitat,TotMeans)}
+
+\NormalTok{TotalBarDensity.plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(fbs.df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{BarsTotal, }\AttributeTok{fill =}\NormalTok{ Habitat))}\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{alpha=}\FloatTok{0.5}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ HabitatMeans, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ TotMeans, }\AttributeTok{color=}\NormalTok{TotHabitat),}
+             \AttributeTok{linetype=}\StringTok{"dashed"}\NormalTok{,}
+             \AttributeTok{size =} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"\#D95F02"}\NormalTok{, }\StringTok{"\#1B9E77"}\NormalTok{))}\SpecialCharTok{+}
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Frequency"}\NormalTok{)}\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Total number of fault bars"}\NormalTok{)}
+
+\NormalTok{TotalBarDensity.plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{FaultBar_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\#1. Restrict by feather type \# - Total fault bars \# - Medium fault
+bars
+
+\#2. Combine light and medium fault bars
+
+\#3. Feather weight by Habitat for feather type
+
+\#4. Length of fault bar by Habitat
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fbs.prim.df }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(fbs.df, Type }\SpecialCharTok{==} \StringTok{"primary"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
