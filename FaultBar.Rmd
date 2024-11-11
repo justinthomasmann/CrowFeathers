@@ -6,12 +6,13 @@ output: html_document
 ---
 
 ```{r libraries}
-library(tidyverse)
+library(tidyverse) 
 library(lme4)
 library(nnet)
 library(broom)
 library(glmmTMB)
 library(MCMCglmm)
+theme_set(theme_classic())
 ```
 
 
@@ -38,25 +39,8 @@ hist(fb.df$Length)
 fb.df$LengthScaled <- scale(fb.df$Length)
 ```
 
-```{r}
+```{r fb length scaled histogram}
 hist(fb.df$LengthScaled)
-```
-
-
-```{r length.mdl}
-length.mdl <- lmer(LengthScaled ~  Habitat + (1|Feather), data = fb.df)
-summary(length.mdl)
-```
-
-```{r residual distribution}
-hist(residuals(length.mdl))
-```
-
-
-```{r grade.mdl}
-grade.mdl <- nnet::multinom(Grade ~  Habitat, data = fb.df)
-summary(grade.mdl)
-broom::tidy(grade.mdl)
 ```
 
 
@@ -68,28 +52,32 @@ n_occur <- data.frame(table(fbs.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
 ```
 
-
-```{r}
+### Sums of light fault bars in urban and rural habitats
+```{r Light fb sums by habitat}
 sum(fbs.df$LightBars[fbs.df$Habitat=="urban"]) #200 urban light bars
 sum(fbs.df$LightBars[fbs.df$Habitat=="rural"]) #300 rural light bars
 ```
 
 
-```{r}
+
+
+### Gausian linear model for light fault bars. 
+This model uses a Gaussian probability distribution which is not appropriate for count data.
+```{r light fb gaussian mdl}
 summary(lm(data = fbs.df, LightBars ~ Habitat))
 ```
 
-
-```{r}
-summary(lm(data = fbs.df, LightBars ~ Habitat))
-```
-
-```{r}
+### Poisson model for light fault bars.
+This model uses the poisson probability distribution which is appropriate for count data. 
+There are significantly fewer light fault bars in the urban habitat.
+```{r light fb poisson mdl}
 light.poisson.mdl <- (glm(data = fbs.df, LightBars ~ Habitat, family = "poisson"))
 summary(light.poisson.mdl)
 ```
 
-
+### Zero inflation test
+This code confirms that the data are zero inflated.
+The output states that ~40% of the observed data are zeros, while the poisson model only expects ~7% of the data points to be zeros. 
 ```{r zero inflation test}
 #zero inflation test from: http://data.princeton.edu/wws509/r/overdispersion.html 
 zobs <- fbs.df$LightBars == 0
@@ -98,14 +86,15 @@ c(obs=mean(zobs), poi = mean(zpoi))
 ```
 
 
-
-```{r}
+### Zero-inflated poisson model
+This model accounts for the zero inflated data. There are still significantly fewer light fault bars in the urban habitat.
+```{r light fb ZIP mdl}
 summary(glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
-
-```{r}
-theme_set(theme_classic())
+### Light fault bar density plot
+This plot shows the frequency of light fault bar numbers per feather in the urban and rural samples. The dotted lines are the habitat means.
+```{r light fb density plot}
 mean(fbs.df$LightBars[fbs.df$Habitat=="urban"])
 mean(fbs.df$LightBars[fbs.df$Habitat=="rural"])
 
@@ -119,32 +108,63 @@ LightBarDensity.plot <- ggplot(fbs.df, aes(x=LightBars, fill = Habitat))+
              linetype="dashed",
              size = 1,
              show.legend = FALSE)+
-  scale_fill_manual(values = c("#D95F02", "#1B9E77"))
+  scale_fill_manual(values = c("#D95F02", "#1B9E77"))+
+  ylab("Frequency")+
+  xlab("Number of light fault bars")
 
 LightBarDensity.plot
 ```
 
 
-
-```{r}
-
+### Sum of medium fault bars in urban and rural habitats
+```{r sum of medium fb per habitat}
 sum(fbs.df$MediumBars[fbs.df$Habitat=="urban"])
 sum(fbs.df$MediumBars[fbs.df$Habitat=="rural"])
+```
 
+
+### Poisson model for medium fault bars
+This model shows significantly fewer medium fault bars in the urban habitat
+```{r medium fb poisson mdl}
+summary(glmmTMB(data = fbs.df, MediumBars ~ Habitat, family = "poisson"))
+```
+
+
+### Zero-inflated poisson model for medium fault bars
+For some unknown reason, this model no longer shows a significant relationship. NEED TO INVESTIGATE!
+```{r medium fb ZIP mdl}
 summary(glmmTMB(data = fbs.df, MediumBars ~ Habitat, ziformula=~1, family = "poisson"))
 ```
 
 
-```{r}
-summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
+### Sum of strong fault bars in urban and rural habitats
+```{r sum of strong fb per habitat}
+sum(fbs.df$StrongBars[fbs.df$Habitat=="urban"])
+sum(fbs.df$StrongBars[fbs.df$Habitat=="rural"])
 ```
 
 
-```{r}
+### Poisson model for strong fault bars
+This model shows a trend towards more strong fault bars in the urban habitat, but the relationship is non significant. The proportional difference is similar, but the strong bar sample is smaller.
+```{r strong fb poisson mdl}
+summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
+```
+
+### Zero-inflated poisson model for strong fault bars
+```{r strong fb ZIP mdl}
+summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, ziformula = ~1, family = "poisson"))
+```
+
+
+### Zero-inflated poisson model for total number of fault bars
+Overall, there are significantly fewer total fault bars in the urban habitat sample.
+```{r total fb ZIP mdl}
 summary(glmmTMB(data = fbs.df, BarsTotal ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
 
+### Total fault bar density plot
+This plot shows the frequency of total fault bar numbers per feather in the urban and rural samples. The dotted lines are the habitat means.
 ```{r}
 mean(fbs.df$BarsTotal[fbs.df$Habitat=="urban"])
 mean(fbs.df$BarsTotal[fbs.df$Habitat=="rural"])
@@ -159,7 +179,9 @@ TotalBarDensity.plot <- ggplot(fbs.df, aes(x=BarsTotal, fill = Habitat))+
              linetype="dashed",
              size = 1,
              show.legend = FALSE)+
-  scale_fill_manual(values = c("#D95F02", "#1B9E77"))
+  scale_fill_manual(values = c("#D95F02", "#1B9E77"))+
+  ylab("Frequency")+
+  xlab("Total number of fault bars")
 
 TotalBarDensity.plot
 ```
@@ -173,32 +195,12 @@ TotalBarDensity.plot
 #3. Feather weight by Habitat for feather type
 
 #4. Length of fault bar by Habitat
-```{r}
-summary(lm(data = fbs.df, DamageScore ~ Habitat))
-```
 
 
-```{r}
-summary(lm(data = fbs.df, LightLength ~ Habitat))
-```
-
-
-```{r}
-summary(lm(data = fbs.df, MediumLength ~ Habitat))
-```
-
-
-```{r}
-summary(lm(data = fbs.df, StrongLength ~ Habitat))
-```
-
-
-```{r}
+```{r primary df subset}
 fbs.prim.df <- subset(fbs.df, Type == "primary")
 ```
 
 
-```{r}
-summary(lm(data = fbs.prim.df, LightBars ~ Habitat))
-```
+
 
