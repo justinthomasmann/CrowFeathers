@@ -187,30 +187,33 @@ TotalBarDensity.plot <- ggplot(fbs.df, aes(x=BarsTotal, fill = Habitat))+
 
 TotalBarDensity.plot
 ```
+# To do list
+### 1. Restrict by feather type (DONE)
+###  - Total fault bars
+###  - Medium fault bars
 
-#1. Restrict by feather type (DONE)
-#  - Total fault bars
-#  - Medium fault bars
+### 2. Combine light and medium fault bars
 
-#2. Combine light and medium fault bars
+### 3. Feather weight by Habitat for feather type
 
-#3. Feather weight by Habitat for feather type
+### 4. Length of fault bar by Habitat
 
-#4. Length of fault bar by Habitat
+## Subsetting by feather type
 
-
-### Subsetting by feather type
+### Primary feather subset
 ```{r primary df subset}
 fbs.prim.df <- subset(fbs.df, Type == "primary")
 ```
 
-
+### Primary feather light fault bar Poisson model
+Significantly fewer in urban habitat
 ```{r primary light fb poisson mdl}
 prim.light.poisson.mdl <- glmmTMB(data = fbs.prim.df, LightBars ~ Habitat, family = "poisson")
 summary(prim.light.poisson.mdl)
 ```
 
-
+### Zero inflation test for primary feather light fault bars
+Still strongly zero-inflated data
 ```{r primary light zero inflation test}
 #zero inflation test from: http://data.princeton.edu/wws509/r/overdispersion.html 
 zobs <- fbs.prim.df$LightBars == 0
@@ -218,42 +221,55 @@ zpoi <- exp(-exp(predict(prim.light.poisson.mdl)))
 c(obs=mean(zobs), poi = mean(zpoi))
 ```
 
-
+### Primary feather light fault bar ZIP model
+Nonsignificant relationship
 ```{r primary light fb ZIP mdl}
 prim.light.ZIP.mdl <- glmmTMB(data = fbs.prim.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
 summary(prim.light.ZIP.mdl)
 ```
 
-
+### Primary feather medium fault bar ZIP model
+Nonsignificant relationship
 ```{r primary medium fb mdl}
-summary(glmmTMB(data = fbs.prim.df, MediumBars ~ Habitat, family = "poisson"))
+summary(glmmTMB(data = fbs.prim.df, MediumBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
+
+### Secondary feather subset
 ```{r secondary df subset}
 fbs.sec.df <- subset(fbs.df, Type == "secondary")
 ```
 
 
+### Secondary feather light fault bar ZIP model
+Nonsignificant relationship
 ```{r secondary light fb mdl}
 summary(glmmTMB(data = fbs.sec.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
 
+### Secondary feather medium fault bar ZIP model
+Significantly MORE medium fault bars in the secondary feathers
 ```{r secondary medium fb mdl}
-summary(glmmTMB(data = fbs.sec.df, MediumBars ~ Habitat, family = "poisson"))
+summary(glmmTMB(data = fbs.sec.df, MediumBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
-
+### Tail feather subset
 ```{r tail df subset}
 fbs.tail.df <- subset(fbs.df, Type == "tail")
 ```
 
 
+### Tail feather light fault bar ZIP model
+Significantly fewer light fault bars in the urban habitat
 ```{r tail light fb ZIP mdl}
 summary(glmmTMB(data = fbs.tail.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
 
-
+### Tail feather medium fault bar ZIP model
+Significantly fewer medium fault bars in urban habitat
 ```{r tail medium fb mdl}
 summary(glmmTMB(data = fbs.tail.df, MediumBars ~ Habitat, ziformula = ~1, family = "poisson"))
 ```
+
+
