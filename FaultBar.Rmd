@@ -1,7 +1,7 @@
 ---
 title: "Crow Fault Bars"
 author: "Justin Mann"
-date: "2024-10-04"
+date: "2024-11-12"
 output: html_document
 ---
 
@@ -12,35 +12,9 @@ library(nnet)
 library(broom)
 library(glmmTMB)
 library(MCMCglmm)
+library(DHARMa)
+library(bbmle)
 theme_set(theme_classic())
-```
-
-
-```{r import longform data}
-fb.df <- read.csv("FaultBarData.csv", h=T)
-fb.df$Length <- as.numeric(fb.df$Length)
-fb.df$Habitat <- as.factor(fb.df$Habitat)
-fb.df <- fb.df %>% drop_na(Grade, Habitat, Length)
-fb.df$Grade <- as.factor(fb.df$Grade)
-fb.df$Feather <- as.factor(fb.df$Feather)
-```
-
-
-```{r Length Scatter Plot}
-range(fb.df$Length)
-plot(fb.df$Length)
-```
-
-```{r Length Histogram}
-hist(fb.df$Length)
-```
-
-```{r scaling length}
-fb.df$LengthScaled <- scale(fb.df$Length)
-```
-
-```{r fb length scaled histogram}
-hist(fb.df$LengthScaled)
 ```
 
 
@@ -61,38 +35,53 @@ sum(fbs.df$LightBars[fbs.df$Habitat=="rural"]) #300 rural light bars
 ```
 
 
-
-
 ### Gausian linear model for light fault bars. 
 This model uses a Gaussian probability distribution which is not appropriate for count data.
 ```{r light fb gaussian mdl}
 summary(lm(data = fbs.df, LightBars ~ Habitat))
 ```
 
+
 ### Poisson model for light fault bars.
-This model uses the poisson probability distribution which is appropriate for count data. 
-There are significantly fewer light fault bars in the urban habitat.
 ```{r light fb poisson mdl}
 light.poisson.mdl <- (glm(data = fbs.df, LightBars ~ Habitat, family = "poisson"))
-summary(light.poisson.mdl)
 ```
 
-### Zero inflation test
-This code confirms that the data are zero inflated.
-The output states that ~40% of the observed data are zeros, while the poisson model only expects ~7% of the data points to be zeros. 
-```{r zero inflation test}
-#zero inflation test from: http://data.princeton.edu/wws509/r/overdispersion.html 
-zobs <- fbs.df$LightBars == 0
-zpoi <- exp(-exp(predict(light.poisson.mdl)))
-c(obs=mean(zobs), poi = mean(zpoi))
+
+### DHARMa package zero inflation test
+Significantly zero inflated
+```{r DHARMa zero inflation test}
+light.res.sim <- simulateResiduals(light.poisson.mdl)
+testZeroInflation(light.res.sim)
+```
+
+
+### DHARMa package overdispersion test
+Significantly overdispersed. This means that we should be using a negative binomial distribution which has an overdispersion parameter.
+```{r light fb DHARMa overdispersion test}
+testOverdispersion(light.res.sim)
 ```
 
 
 ### Zero-inflated poisson model
-This model accounts for the zero inflated data. There are still significantly fewer light fault bars in the urban habitat.
 ```{r light fb ZIP mdl}
-summary(glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson"))
+light.ZIP.mdl <- glmmTMB(data = fbs.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
 ```
+
+### Light fault bar AIC model comparison
+This output suggests that the negative binomial 2 distribution provides the best fit.
+```{r light mdl AIC comparison}
+light.ZINB1.mdl <- update(light.ZIP.mdl, family = nbinom1)
+light.ZINB2.mdl <- update(light.ZIP.mdl, family = nbinom2)
+AICtab(light.poisson.mdl, light.ZIP.mdl, light.ZINB1.mdl, light.ZINB2.mdl)
+```
+
+
+### Best fit light fault bar model
+```{r light fb ZINB mdl}
+summary(light.ZINB2.mdl)
+```
+
 
 ### Light fault bar density plot
 This plot shows the frequency of light fault bar numbers per feather in the urban and rural samples. The dotted lines are the habitat means.
@@ -126,16 +115,43 @@ sum(fbs.df$MediumBars[fbs.df$Habitat=="rural"])
 
 
 ### Poisson model for medium fault bars
-This model shows significantly fewer medium fault bars in the urban habitat
 ```{r medium fb poisson mdl}
-summary(glmmTMB(data = fbs.df, MediumBars ~ Habitat, family = "poisson"))
+medium.poisson.mdl <- glmmTMB(data = fbs.df, MediumBars ~ Habitat, family = "poisson")
 ```
 
 
-### Zero-inflated poisson model for medium fault bars
-For some unknown reason, this model no longer shows a significant relationship. NEED TO INVESTIGATE!
+### Zero inflation test for medium fault bars
+```{r DHARMa medium fb zero inflation test}
+medium.res.sim <- simulateResiduals(medium.poisson.mdl)
+testZeroInflation(medium.res.sim)
+```
+
+
+### Overdispersion test for medium fault bars
+```{r medium fb DHARMa overdispersion test}
+testOverdispersion(medium.res.sim)
+```
+
+
+### Medium fault bar ZIP model
 ```{r medium fb ZIP mdl}
-summary(glmmTMB(data = fbs.df, MediumBars ~ Habitat, ziformula=~1, family = "poisson"))
+medium.ZIP.mdl <- glmmTMB(data = fbs.df, MediumBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Medium fault bar AIC model comparison
+This output suggests that the negative binomial 1 distribution provides the best fit.
+```{r medium mdl AIC comparison}
+medium.ZINB1.mdl <- update(medium.ZIP.mdl, family = nbinom1)
+medium.ZINB2.mdl <- update(medium.ZIP.mdl, family = nbinom2)
+AICtab(medium.poisson.mdl, medium.ZIP.mdl, medium.ZINB1.mdl, medium.ZINB2.mdl)
+```
+
+
+### Best fit medium fault bar model
+This model shows significantly fewer medium fault bars in the urban population
+```{r medium fb ZINB1 mdl}
+summary(medium.ZINB1.mdl)
 ```
 
 
@@ -147,21 +163,81 @@ sum(fbs.df$StrongBars[fbs.df$Habitat=="rural"])
 
 
 ### Poisson model for strong fault bars
-This model shows a trend towards more strong fault bars in the urban habitat, but the relationship is non significant. The proportional difference is similar, but the strong bar sample is smaller.
 ```{r strong fb poisson mdl}
-summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = "poisson"))
-```
-
-### Zero-inflated poisson model for strong fault bars
-```{r strong fb ZIP mdl}
-summary(glmmTMB(data = fbs.df, StrongBars ~ Habitat, ziformula = ~1, family = "poisson"))
+strong.poisson.mdl <- glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = "poisson")
 ```
 
 
-### Zero-inflated poisson model for total number of fault bars
-Overall, there are significantly fewer total fault bars in the urban habitat sample.
+### Strong fault bar zero inflation test
+Strong fault bar data are not significantly zero-inflated
+```{r DHARMa strong fb zero inflation test}
+strong.res.sim <- simulateResiduals(strong.poisson.mdl)
+testZeroInflation(strong.res.sim)
+```
+
+
+### Overdispersion test for strong fault bars
+```{r strong fb DHARMa overdispersion test}
+testOverdispersion(strong.res.sim)
+```
+
+
+### Strong fault bar NB1 model
+```{r strong fb NB1 mdl}
+strong.NB1.mdl <- glmmTMB(data = fbs.df, StrongBars ~ Habitat, family = nbinom1)
+```
+
+
+### Strong bar AIC model comparison
+This output suggests that the negative binomial 1 distribution provides the best fit.
+```{r strong mdl AIC comparison}
+strong.NB2.mdl <- update(strong.NB1.mdl, family = nbinom2)
+AICtab(strong.poisson.mdl, strong.NB1.mdl, strong.NB2.mdl)
+```
+
+
+### Best fit strong fault bar model
+```{r}
+summary(strong.NB1.mdl)
+```
+
+
+### Poisson model for total number of fault bars
+```{r total fb poisson mdl}
+total.poisson.mdl <- glmmTMB(data = fbs.df, BarsTotal ~ Habitat, family = "poisson")
+```
+
+
+### Total fault bar zero inflation test
+```{r DHARMa total fb zero inflation test}
+total.res.sim <- simulateResiduals(total.poisson.mdl)
+testZeroInflation(total.res.sim)
+```
+
+
+### Overdispersion test for total fault bars
+```{r total fb DHARMa overdispersion test}
+testOverdispersion(total.res.sim)
+```
+
+
+### Total fault bar ZIP model
 ```{r total fb ZIP mdl}
-summary(glmmTMB(data = fbs.df, BarsTotal ~ Habitat, ziformula = ~1, family = "poisson"))
+total.ZIP.mdl <- glmmTMB(data = fbs.df, BarsTotal ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Total fault bar AIC model comparison
+```{r total mdl AIC comparison}
+total.NB1.mdl <- update(total.ZIP.mdl, family = nbinom1)
+total.NB2.mdl <- update(total.ZIP.mdl, family = nbinom2)
+AICtab(total.poisson.mdl, total.ZIP.mdl, total.NB1.mdl, total.NB2.mdl)
+```
+
+
+### Best fit total fault bar model
+```{r total fb NB2 mdl}
+summary(total.NB2.mdl)
 ```
 
 
@@ -187,7 +263,9 @@ TotalBarDensity.plot <- ggplot(fbs.df, aes(x=BarsTotal, fill = Habitat))+
 
 TotalBarDensity.plot
 ```
-# To do list
+
+
+## To do list
 ### 1. Restrict by feather type (DONE)
 ###  - Total fault bars
 ###  - Medium fault bars
@@ -198,12 +276,58 @@ TotalBarDensity.plot
 
 ### 4. Length of fault bar by Habitat
 
+
+```{r lpm poisson mdl}
+lpm.poisson.mdl <- glmmTMB(data = fbs.df, LightPlusMedium ~ Habitat, family = "poisson")
+```
+
+
+### LightPlusMedium fault bar zero inflation test
+```{r DHARMa lpm fb zero inflation test}
+lpm.res.sim <- simulateResiduals(lpm.poisson.mdl)
+testZeroInflation(lpm.res.sim)
+```
+
+
+### Overdispersion test for lpm fault bars
+```{r lpm fb DHARMa overdispersion test}
+testOverdispersion(lpm.res.sim)
+```
+
+
+### LightPlusMedium ZIP model
+```{r lpm ZIP mdl}
+lpm.ZIP.mdl <- glmmTMB(data = fbs.df, LightPlusMedium ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### LPM fault bar AIC model comparison
+```{r lpm mdl AIC comparison}
+lpm.NB1.mdl <- update(lpm.ZIP.mdl, family = nbinom1)
+lpm.NB2.mdl <- update(lpm.ZIP.mdl, family = nbinom2)
+AICtab(lpm.poisson.mdl, lpm.ZIP.mdl, lpm.NB1.mdl, lpm.NB2.mdl)
+```
+
+
+### Best fit LPM model
+```{r lpm NB1 mdl}
+summary(lpm.NB1.mdl)
+```
+
+
+
 ## Subsetting by feather type
 
 ### Primary feather subset
 ```{r primary df subset}
 fbs.prim.df <- subset(fbs.df, Type == "primary")
 ```
+
+
+```{r primary total fb ZIP mdl}
+summary(glmmTMB(data = fbs.prim.df, BarsTotal ~ Habitat, ziformula = ~1, family = "poisson"))
+```
+
 
 ### Primary feather light fault bar Poisson model
 Significantly fewer in urban habitat
