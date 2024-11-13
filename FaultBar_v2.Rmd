@@ -1,0 +1,24 @@
+---
+title: "Crow Fault Bars v2"
+author: "Justin Mann"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r libraries}
+library(tidyverse) #data wrangling and plotting functions
+library(glmmTMB) #ZIP & ZINB models
+library(DHARMa) #Dispersion and zero inflation test
+library(bbmle) #AICtab for model comparison
+theme_set(theme_classic())
+```
+
+
+```{r import data}
+fb.df <- read.csv("FeatherMaster_1Nov24.csv", h=T)
+fb.df <- fb.df[,1:15]
+fb.df$ID <- as.factor(fbs.df$ID)
+n_occur <- data.frame(table(fbs.df$ID))
+n_occur[n_occur$Freq > 1,]#no repeat IDs
+fb.df$LightPlusMedium <- fb.df$LightBars + fbs.df$MediumBars #a column combining light and medium bars
+```
