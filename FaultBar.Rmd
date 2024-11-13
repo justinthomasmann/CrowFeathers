@@ -6,14 +6,10 @@ output: html_document
 ---
 
 ```{r libraries}
-library(tidyverse) 
-library(lme4)
-library(nnet)
-library(broom)
-library(glmmTMB)
-library(MCMCglmm)
-library(DHARMa)
-library(bbmle)
+library(tidyverse) #data wrangling and plotting functions
+library(glmmTMB) #ZIP & ZINB models
+library(DHARMa) #Dispersion and zero inflation test
+library(bbmle) #AICtab for model comparison
 theme_set(theme_classic())
 ```
 
