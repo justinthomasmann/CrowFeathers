@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r libraries}
+```{r libraries, echo=FALSE}
 library(tidyverse) #data wrangling and plotting functions
 library(glmmTMB) #ZIP & ZINB models
 library(DHARMa) #Dispersion and zero inflation test
@@ -15,9 +15,101 @@ theme_set(theme_classic())
 
 
 ```{r import data}
-fb.df <- read.csv("FeatherMaster_1Nov24.csv", h=T)
-fb.df <- fb.df[,1:15]
+fb.df <- read.csv("FaultBarMaster_15Nov24.csv", h=T)
 fb.df$ID <- as.factor(fb.df$ID)
 n_occur <- data.frame(table(fb.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
 ```
+
+
+```{r}
+ggplot(data = fb.df, aes(x=Type, y=TotalBars))+
+  geom_boxplot()+
+  ylab("Number of fault bars")
+```
+
+```{r}
+summary(lm(data = fb.df, MeanLightLength ~ Habitat))
+```
+
+
+
+```{r}
+ggplot(data = fb.df, aes(x=Habitat, y=MeanLightLength))+
+  geom_boxplot()
+```
+
+
+
+```{r light poisson mdl}
+light.poisson.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, family = "poisson")
+summary(light.poisson.mdl)
+```
+
+
+### LightPlusMedium fault bar zero inflation test
+```{r DHARMa light fb zero inflation test}
+light.res.sim <- simulateResiduals(light.poisson.mdl)
+testZeroInflation(light.res.sim)
+```
+
+
+### Overdispersion test for light fault bars
+```{r light fb DHARMa overdispersion test}
+testOverdispersion(light.res.sim)
+```
+
+
+### LightPlusMedium ZIP model
+```{r light ZIP mdl}
+light.ZIP.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### light fault bar AIC model comparison
+```{r light mdl AIC comparison}
+light.NB1.mdl <- update(light.ZIP.mdl, family = nbinom1)
+light.NB2.mdl <- update(light.ZIP.mdl, family = nbinom2)
+AICtab(light.poisson.mdl, light.ZIP.mdl, light.NB1.mdl, light.NB2.mdl)
+```
+
+
+### Best fit light model
+```{r light NB1 mdl}
+summary(light.NB1.mdl)
+```
+
+
+### Overdispersion test for light NB1 fault bars
+```{r light fb DHARMa overdispersion test}
+light.NB1.res.sim <- simulateResiduals(light.NB1.mdl)
+testOverdispersion(light.NB1.res.sim)
+```
+
+
+```{r light fb DHARMa outlier test}
+testOutliers(light.NB1.mdl, alternative = "greater")
+```
+
+
+
+### Light fault bar density plot
+This plot shows the frequency of light fault bar numbers per feather in the urban and rural samples. The dotted lines are the habitat means.
+```{r light fb density plot}
+Habitat <- c("Urban", "Rural")
+Means <- c(mean(fb.df$LightBars[fb.df$Habitat=="urban"]),mean(fb.df$LightBars[fb.df$Habitat=="rural"]))
+HabitatMeans <- data.frame(Habitat,Means)
+
+LightBarDensity.plot <- ggplot(fb.df, aes(x=LightBars, fill = Habitat))+
+  geom_density(alpha=0.5)+
+  geom_vline(data = HabitatMeans, aes(xintercept = Means, color=Habitat),
+             linetype="dashed",
+             size = 1,
+             show.legend = FALSE)+
+  scale_fill_manual(values = c("#D95F02", "#1B9E77"))+
+  ylab("Frequency")+
+  xlab("Number of light fault bars")
+
+LightBarDensity.plot
+```
+
