@@ -17,8 +17,7 @@ theme_set(theme_classic())
 ```{r import data}
 fb.df <- read.csv("FeatherMaster_1Nov24.csv", h=T)
 fb.df <- fb.df[,1:15]
-fb.df$ID <- as.factor(fbs.df$ID)
-n_occur <- data.frame(table(fbs.df$ID))
+fb.df$ID <- as.factor(fb.df$ID)
+n_occur <- data.frame(table(fb.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
-fb.df$LightPlusMedium <- fb.df$LightBars + fbs.df$MediumBars #a column combining light and medium bars
 ```
