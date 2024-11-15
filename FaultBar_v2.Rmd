@@ -34,7 +34,7 @@ summary(lm(data = fb.df, MeanLightLength ~ Habitat))
 
 
 
-```{r}
+```{r boxplot light bar by habitat}
 ggplot(data = fb.df, aes(x=Habitat, y=MeanLightLength))+
   geom_boxplot()
 ```
@@ -81,7 +81,7 @@ summary(light.NB1.mdl)
 
 
 ### Overdispersion test for light NB1 fault bars
-```{r light fb DHARMa overdispersion test}
+```{r light fb DHARMa overdispersion test NB1 mdl}
 light.NB1.res.sim <- simulateResiduals(light.NB1.mdl)
 testOverdispersion(light.NB1.res.sim)
 ```
