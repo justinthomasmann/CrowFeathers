@@ -14,6 +14,12 @@ theme_set(theme_classic())
 ```
 
 
+```{r}
+palette.colors(palette = "Tableau 10")
+```
+
+
+
 ```{r import data}
 fb.df <- read.csv("FaultBarMaster_15Nov24.csv", h=T)
 fb.df$ID <- as.factor(fb.df$ID)
@@ -21,52 +27,112 @@ n_occur <- data.frame(table(fb.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
 ```
 
-
-```{r}
-ggplot(data = fb.df, aes(x=Type, y=TotalBars))+
-  geom_boxplot()+
+### Number of fault bars (>0) per feather type
+```{r TotalBars>0 by Type boxplot}
+fb.nozero.df <- fb.df %>% filter(TotalBars>0)
+ggplot(data = fb.nozero.df, aes(x=Type, y=TotalBars))+
+  geom_boxplot(fill = palette.colors(n = 3, palette = "Tableau 10"))+
   ylab("Number of fault bars")
 ```
 
-```{r}
-summary(lm(data = fb.df, MeanLightLength ~ Habitat))
+## MODELING TOTAL FAULT BARS
+
+### Poisson model for total number of fault bars
+```{r total fb poisson mdl}
+total.poisson.mdl <- glmmTMB(data = fb.df, TotalBars ~ Habitat, family = "poisson")
 ```
 
 
-
-```{r boxplot light bar by habitat}
-ggplot(data = fb.df, aes(x=Habitat, y=MeanLightLength))+
-  geom_boxplot()
+### Zero inflation test for total.poisson.mdl
+```{r DHARMa total fb zero inflation test}
+total.res.sim <- simulateResiduals(total.poisson.mdl)
+testZeroInflation(total.res.sim)
 ```
 
 
+### Overdispersion test for total.poisson.mdl
+```{r total fb DHARMa overdispersion test}
+testOverdispersion(total.res.sim)
+```
 
+
+### Total fault bar zero inflated poisson model
+```{r total fb ZIP mdl}
+total.ZIP.mdl <- glmmTMB(data = fb.df, TotalBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Total fault bar model AIC comparison
+```{r total mdl AIC comparison}
+total.NB1.mdl <- update(total.ZIP.mdl, family = nbinom1)
+total.NB2.mdl <- update(total.ZIP.mdl, family = nbinom2)
+AICtab(total.poisson.mdl, total.ZIP.mdl, total.NB1.mdl, total.NB2.mdl)
+```
+
+
+### Best fit total fault bar model
+As per AIC comparison, the negative binomial 2 model provides the best fit.
+```{r total fb NB2 mdl}
+summary(total.NB2.mdl)
+```
+
+### Outlier test for total.nb2.mdl
+```{r total fb NB2.mdl outlier test}
+total.nb2.res.sim <- simulateResiduals(total.NB2.mdl)
+testOutliers(total.nb2.res.sim, alternative = "greater")
+```
+
+
+### Total fault bar density plot
+This plot shows the frequency of total fault bar numbers per feather in the urban and rural populations. Dotted lines are the urban and rural means.
+```{r total fb density plot}
+TotHabitat <- c("Urban", "Rural")
+TotMeans <- c(mean(fb.df$TotalBars[fb.df$Habitat=="urban"]), mean(fb.df$TotalBars[fb.df$Habitat=="rural"]))
+TotHabitatMeans <- data.frame(TotHabitat,TotMeans)
+
+TotalBarDensity.plot <- ggplot(fb.df, aes(x=TotalBars, fill = Habitat))+
+  geom_density(alpha = 0.5)+
+  geom_vline(data = TotHabitatMeans, aes(xintercept = TotMeans, color = TotHabitat),
+             linetype="dashed",
+             size = 1,
+             show.legend = FALSE)+
+  scale_fill_manual(values = c("#F28E2B", "#4E79A7"))+
+  ylab("Frequency")+
+  xlab("Total number of fault bars (Light + Strong)")
+
+TotalBarDensity.plot
+```
+
+
+## MODELING LIGHT FAULT BARS
+
+### Light fault bar poisson model
 ```{r light poisson mdl}
 light.poisson.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, family = "poisson")
 summary(light.poisson.mdl)
 ```
 
 
-### LightPlusMedium fault bar zero inflation test
+### Zero inflation test for light.poisson.mdl
 ```{r DHARMa light fb zero inflation test}
 light.res.sim <- simulateResiduals(light.poisson.mdl)
 testZeroInflation(light.res.sim)
 ```
 
 
-### Overdispersion test for light fault bars
+### Overdispersion test for light.poisson.mdl
 ```{r light fb DHARMa overdispersion test}
 testOverdispersion(light.res.sim)
 ```
 
 
-### LightPlusMedium ZIP model
+### Light fault bar zero inflated poisson model
 ```{r light ZIP mdl}
 light.ZIP.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
 ```
 
 
-### light fault bar AIC model comparison
+### Light fault bar model AIC comparison
 ```{r light mdl AIC comparison}
 light.NB1.mdl <- update(light.ZIP.mdl, family = nbinom1)
 light.NB2.mdl <- update(light.ZIP.mdl, family = nbinom2)
@@ -75,18 +141,21 @@ AICtab(light.poisson.mdl, light.ZIP.mdl, light.NB1.mdl, light.NB2.mdl)
 
 
 ### Best fit light model
+As per AIC comparison, negative binomial 1 model provides the best fit
 ```{r light NB1 mdl}
 summary(light.NB1.mdl)
 ```
 
 
-### Overdispersion test for light NB1 fault bars
+### Overdispersion test for light.NB1.mdl
 ```{r light fb DHARMa overdispersion test NB1 mdl}
 light.NB1.res.sim <- simulateResiduals(light.NB1.mdl)
 testOverdispersion(light.NB1.res.sim)
 ```
 
 
+### Outlier test for light.NB1.mdl
+The NB1 model has no outliers
 ```{r light fb DHARMa outlier test}
 testOutliers(light.NB1.mdl, alternative = "greater")
 ```
@@ -94,22 +163,108 @@ testOutliers(light.NB1.mdl, alternative = "greater")
 
 
 ### Light fault bar density plot
-This plot shows the frequency of light fault bar numbers per feather in the urban and rural samples. The dotted lines are the habitat means.
+This plot shows the frequency of light fault bar numbers in the urban and rural populations. Dotted lines are the urban and rural means.
 ```{r light fb density plot}
-Habitat <- c("Urban", "Rural")
-Means <- c(mean(fb.df$LightBars[fb.df$Habitat=="urban"]),mean(fb.df$LightBars[fb.df$Habitat=="rural"]))
-HabitatMeans <- data.frame(Habitat,Means)
+LightHabitat <- c("Urban", "Rural")
+LightMeans <- c(mean(fb.df$LightBars[fb.df$Habitat=="urban"]),mean(fb.df$LightBars[fb.df$Habitat=="rural"]))
+LightHabitatMeans <- data.frame(LightHabitat,LightMeans)
 
 LightBarDensity.plot <- ggplot(fb.df, aes(x=LightBars, fill = Habitat))+
   geom_density(alpha=0.5)+
-  geom_vline(data = HabitatMeans, aes(xintercept = Means, color=Habitat),
+  geom_vline(data = LightHabitatMeans, aes(xintercept = LightMeans, color = LightHabitat),
              linetype="dashed",
              size = 1,
              show.legend = FALSE)+
-  scale_fill_manual(values = c("#D95F02", "#1B9E77"))+
+  scale_fill_manual(values = c("#F28E2B", "#4E79A7"))+
   ylab("Frequency")+
   xlab("Number of light fault bars")
 
 LightBarDensity.plot
+```
+
+
+## MODELING STRONG FAULT BARS
+
+### Strong fault bar poisson model
+```{r strong poisson mdl}
+strong.poisson.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, family = "poisson")
+summary(strong.poisson.mdl)
+```
+
+
+### Zero inflation test for strong.poisson.mdl
+```{r DHARMa strong fb zero inflation test}
+strong.res.sim <- simulateResiduals(strong.poisson.mdl)
+testZeroInflation(strong.res.sim)
+```
+
+
+### Overdispersion test for strong.poisson.mdl
+```{r strong fb DHARMa overdispersion test}
+testOverdispersion(strong.res.sim)
+```
+
+
+### Strong fault bar zero inflated poisson model
+```{r strong ZIP mdl}
+strong.ZIP.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+```{r strong NB1 mdl}
+strong.NB1.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, family = "nbinom1")
+```
+
+```{r strong NB2 mdl}
+strong.NB2.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, family = "nbinom2")
+```
+
+
+
+### Strong fault bar model AIC comparison
+```{r strong mdl AIC comparison}
+AICtab(strong.poisson.mdl, strong.ZIP.mdl, strong.NB1.mdl, strong.NB2.mdl)
+```
+
+
+### Best fit strong model
+AIC comparison says that ZIP model fits best, but the zero inflation test is non significant. There is not a strong difference between the ZIP and NB1 model, so I'm including the NB1 model result. The result is non significant but shows a trend that's opposite of the light model; there are marginally MORE strong bars in urban habitats.
+```{r strong NB1 mdl}
+summary(strong.NB1.mdl)
+```
+
+
+### Overdispersion test for strong.NB1.mdl
+```{r strong fb DHARMa overdispersion test NB1 mdl}
+strong.NB1.res.sim <- simulateResiduals(strong.NB1.mdl)
+testOverdispersion(strong.NB1.res.sim)
+```
+
+
+### Outlier test for strong.NB1.mdl
+The NB1 model has no outliers
+```{r strong fb DHARMa outlier test}
+testOutliers(strong.NB1.mdl, alternative = "greater")
+```
+
+
+
+### Strong fault bar density plot
+This plot shows the frequency of strong fault bar numbers in the urban and rural populations. Dotted lines are the urban and rural means.
+```{r strong fb density plot}
+StrongHabitat <- c("Urban", "Rural")
+StrongMeans <- c(mean(fb.df$StrongBars[fb.df$Habitat=="urban"]),mean(fb.df$StrongBars[fb.df$Habitat=="rural"]))
+StrongHabitatMeans <- data.frame(StrongHabitat,StrongMeans)
+
+StrongBarDensity.plot <- ggplot(fb.df, aes(x=StrongBars, fill = Habitat))+
+  geom_density(alpha=0.5)+
+  geom_vline(data = StrongHabitatMeans, aes(xintercept = StrongMeans, color = StrongHabitat),
+             linetype="dashed",
+             size = 1,
+             show.legend = FALSE)+
+  scale_fill_manual(values = c("#F28E2B", "#4E79A7"))+
+  ylab("Frequency")+
+  xlab("Number of light fault bars")
+
+StrongBarDensity.plot
 ```
 
