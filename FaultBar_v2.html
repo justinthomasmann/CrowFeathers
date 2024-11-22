@@ -519,7 +519,7 @@ testOutliers(total.nb2.res.sim, alternative = &quot;greater&quot;)</code></pre>
 ##  percent confidence interval:
 ##  0.00000000 0.01675978
 ## sample estimates:
-## outlier frequency (expected: 0.00603351955307263 ) 
+## outlier frequency (expected: 0.00541899441340782 ) 
 ##                                                  0</code></pre>
 </div>
 <div id="total-fault-bar-density-plot" class="section level3">
@@ -661,12 +661,12 @@ testOverdispersion(light.NB1.res.sim)</code></pre>
 ##  DHARMa bootstrapped outlier test
 ## 
 ## data:  light.NB1.mdl
-## outliers at both margin(s) = 1, observations = 179, p-value = 0.72
+## outliers at both margin(s) = 1, observations = 179, p-value = 0.73
 ## alternative hypothesis: greater
 ##  percent confidence interval:
-##  0.00000000 0.01969274
+##  0.00000000 0.02234637
 ## sample estimates:
-## outlier frequency (expected: 0.00592178770949721 ) 
+## outlier frequency (expected: 0.00659217877094972 ) 
 ##                                        0.005586592</code></pre>
 </div>
 <div id="light-fault-bar-density-plot" class="section level3">
@@ -809,9 +809,9 @@ testOverdispersion(strong.ZIP.res.sim)</code></pre>
 ## outliers at both margin(s) = 0, observations = 179, p-value = 1
 ## alternative hypothesis: greater
 ##  percent confidence interval:
-##  0.00000000 0.01117318
+##  0.00000000 0.01410615
 ## sample estimates:
-## outlier frequency (expected: 0.00346368715083799 ) 
+## outlier frequency (expected: 0.00379888268156425 ) 
 ##                                                  0</code></pre>
 </div>
 <div id="strong-fault-bar-density-plot" class="section level3">
@@ -875,7 +875,7 @@ testZeroInflation(tot.tail.res.sim)</code></pre>
 </div>
 <div id="total-tail-fault-bar-zero-inflated-poisson-model" class="section level3">
 <h3>Total tail fault bar zero inflated poisson model</h3>
-<pre class="r"><code>tot.tail.ZIP.mdl &lt;- glmmTMB(data = fb.df, LightBars ~ Habitat, ziformula = ~1, family = &quot;poisson&quot;)</code></pre>
+<pre class="r"><code>tot.tail.ZIP.mdl &lt;- glmmTMB(data = fb.tail.df, LightBars ~ Habitat, ziformula = ~1, family = &quot;poisson&quot;)</code></pre>
 </div>
 <div id="total-tail-fault-bar-model-aic-comparison" class="section level3">
 <h3>Total tail fault bar model AIC comparison</h3>
@@ -883,36 +883,36 @@ testZeroInflation(tot.tail.res.sim)</code></pre>
 tot.tail.NB2.mdl &lt;- update(tot.tail.ZIP.mdl, family = nbinom2)
 AICtab(tot.tail.ZIP.mdl, tot.tail.NB1.mdl, tot.tail.NB2.mdl)</code></pre>
 <pre><code>##                  dAIC  df
-## tot.tail.NB1.mdl   0.0 4 
-## tot.tail.NB2.mdl   0.9 4 
-## tot.tail.ZIP.mdl 376.5 3</code></pre>
+## tot.tail.NB2.mdl   0.0 4 
+## tot.tail.NB1.mdl   1.1 4 
+## tot.tail.ZIP.mdl 198.9 3</code></pre>
 </div>
 <div id="best-fit-tot.tail-model" class="section level3">
 <h3>Best fit tot.tail model</h3>
-<p>As per AIC comparison, negative binomial 1 model provides the best
+<p>As per AIC comparison, negative binomial 2 model provides the best
 fit</p>
-<pre class="r"><code>summary(tot.tail.NB1.mdl)</code></pre>
-<pre><code>##  Family: nbinom1  ( log )
+<pre class="r"><code>summary(tot.tail.NB2.mdl)</code></pre>
+<pre><code>##  Family: nbinom2  ( log )
 ## Formula:          LightBars ~ Habitat
 ## Zero inflation:             ~1
-## Data: fb.df
+## Data: fb.tail.df
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    918.9    931.6   -455.4    910.9      175 
+##    369.9    378.2   -180.9    361.9       55 
 ## 
 ## 
-## Dispersion parameter for nbinom1 family (): 7.05 
+## Dispersion parameter for nbinom2 family (): 1.06 
 ## 
 ## Conditional model:
 ##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)    1.6468     0.1202  13.699   &lt;2e-16 ***
-## Habitaturban  -0.3475     0.1621  -2.144    0.032 *  
+## (Intercept)    2.2264     0.1869  11.913   &lt;2e-16 ***
+## Habitaturban  -0.4579     0.2706  -1.692   0.0906 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Zero-inflation model:
 ##             Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)   -19.06    4759.94  -0.004    0.997</code></pre>
+## (Intercept)   -20.57    7684.00  -0.003    0.998</code></pre>
 </div>
 </div>
 <div id="modeling-secondary-fault-bars" class="section level2">

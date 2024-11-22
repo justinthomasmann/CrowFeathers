@@ -318,7 +318,7 @@ testOverdispersion(tot.tail.res.sim)
 
 ### Total tail fault bar zero inflated poisson model
 ```{r tot.tail ZIP mdl}
-tot.tail.ZIP.mdl <- glmmTMB(data = fb.tail.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+tot.tail.ZIP.mdl <- glmmTMB(data = fb.tail.df, TotalBars ~ Habitat, ziformula = ~1, family = "poisson")
 ```
 
 
@@ -334,6 +334,46 @@ AICtab(tot.tail.ZIP.mdl, tot.tail.NB1.mdl, tot.tail.NB2.mdl)
 As per AIC comparison, negative binomial 2 model provides the best fit
 ```{r tot.tail NB2 mdl}
 summary(tot.tail.NB2.mdl)
+```
+
+
+### Light tail fault bar poisson model
+```{r light tail poisson mdl}
+light.tail.poisson.mdl <- glmmTMB(data = fb.tail.df, LightBars ~ Habitat, family = "poisson")
+```
+
+
+### Zero inflation test for light.tail.poisson.mdl
+```{r DHARMa light.tail fb zero inflation test}
+light.tail.res.sim <- simulateResiduals(light.tail.poisson.mdl)
+testZeroInflation(light.tail.res.sim)
+```
+
+
+### Overdispersion test for light.tail.poisson.mdl
+```{r light.tail fb DHARMa overdispersion test}
+testOverdispersion(light.tail.res.sim)
+```
+
+
+### Light tail fault bar zero inflated poisson model
+```{r light.tail ZIP mdl}
+light.tail.ZIP.mdl <- glmmTMB(data = fb.tail.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Light tail fault bar model AIC comparison
+```{r light.tail mdl AIC comparison}
+light.tail.NB1.mdl <- update(light.tail.ZIP.mdl, family = nbinom1)
+light.tail.NB2.mdl <- update(light.tail.ZIP.mdl, family = nbinom2)
+AICtab(light.tail.ZIP.mdl, light.tail.NB1.mdl, light.tail.NB2.mdl)
+```
+
+
+### Best fit light.tail model
+As per AIC comparison, negative binomial 2 model provides the best fit
+```{r light.tail NB2 mdl}
+summary(light.tail.NB2.mdl)
 ```
 
 
