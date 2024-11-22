@@ -318,7 +318,7 @@ testOverdispersion(tot.tail.res.sim)
 
 ### Total tail fault bar zero inflated poisson model
 ```{r tot.tail ZIP mdl}
-tot.tail.ZIP.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+tot.tail.ZIP.mdl <- glmmTMB(data = fb.tail.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
 ```
 
 
@@ -331,9 +331,9 @@ AICtab(tot.tail.ZIP.mdl, tot.tail.NB1.mdl, tot.tail.NB2.mdl)
 
 
 ### Best fit tot.tail model
-As per AIC comparison, negative binomial 1 model provides the best fit
-```{r tot.tail NB1 mdl}
-summary(tot.tail.NB1.mdl)
+As per AIC comparison, negative binomial 2 model provides the best fit
+```{r tot.tail NB2 mdl}
+summary(tot.tail.NB2.mdl)
 ```
 
 
