@@ -10,7 +10,7 @@ library(tidyverse) #data wrangling and plotting functions
 library(glmmTMB) #ZIP & ZINB models
 library(DHARMa) #Dispersion and zero inflation test
 library(bbmle) #AICtab for model comparison
-library(multicmp) #glht() for multiple comparisons
+library(multcomp) #glht() for multiple comparisons
 theme_set(theme_classic())
 ```
 
@@ -24,16 +24,34 @@ palette.colors(palette = "Tableau 10")
 ```{r import data}
 fb.df <- read.csv("FaultBarMaster_15Nov24.csv", h=T)
 fb.df$ID <- as.factor(fb.df$ID)
+fb.df$Habitat <- as.factor(fb.df$Habitat)
 n_occur <- data.frame(table(fb.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
 ```
 
 ### Number of fault bars (>0) per feather type
-```{r TotalBars>0 by Type boxplot}
+```{r TotalBars by Type boxplot}
 fb.nozero.df <- fb.df %>% filter(TotalBars>0)
 ggplot(data = fb.nozero.df, aes(x=Type, y=TotalBars))+
   geom_boxplot(fill = palette.colors(n = 3, palette = "Tableau 10"))+
-  ylab("Number of fault bars")
+  ylab("Total number of fault bars")
+```
+
+### Number of light fault bars (>0) per feather type
+```{r LightBars by Type boxplot}
+fb.light.nozero.df <- fb.df %>% filter(LightBars>0)
+ggplot(data = fb.light.nozero.df, aes(x=Type, y=LightBars))+
+  geom_boxplot(fill = palette.colors(n = 3, palette = "Tableau 10"))+
+  ylab("Number of light fault bars")
+```
+
+
+### Number of strong fault bars (>0) per feather type
+```{r StrongBars by Type boxplot}
+fb.strong.nozero.df <- fb.df %>% filter(StrongBars>0)
+ggplot(data = fb.strong.nozero.df, aes(x=Type, y=StrongBars))+
+  geom_boxplot(fill = palette.colors(n = 3, palette = "Tableau 10"))+
+  ylab("Number of strong fault bars")
 ```
 
 ## MODELING TOTAL FAULT BARS
@@ -212,32 +230,32 @@ strong.ZIP.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, ziformula = ~1, fa
 ```
 
 ```{r strong NB1 mdl}
-strong.NB1.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, family = "nbinom1")
+strong.NB1.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, ziformula = ~1, family = "nbinom1")
 ```
 
 ```{r strong NB2 mdl}
-strong.NB2.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, family = "nbinom2")
+strong.NB2.mdl <- glmmTMB(data = fb.df, StrongBars ~ Habitat, ziformula = ~1, family = "nbinom2")
 ```
 
 
 
 ### Strong fault bar model AIC comparison
 ```{r strong mdl AIC comparison}
-AICtab(strong.poisson.mdl, strong.ZIP.mdl, strong.NB1.mdl, strong.NB2.mdl)
+AICtab(strong.poisson.mdl, strong.ZIP.mdl, strong.NB1.mdl)
 ```
 
 
 ### Best fit strong model
 AIC comparison says that ZIP model fits best, but the zero inflation test is non significant. There is not a strong difference between the ZIP and NB1 model, so I'm including the NB1 model result. The result is non significant but shows a trend that's opposite of the light model; there are marginally MORE strong bars in urban habitats.
-```{r strong NB1 mdl}
+```{r best fit strong mdl}
 summary(strong.NB1.mdl)
 ```
 
 
 ### Overdispersion test for strong.NB1.mdl
 ```{r strong fb DHARMa overdispersion test NB1 mdl}
-strong.NB1.res.sim <- simulateResiduals(strong.NB1.mdl)
-testOverdispersion(strong.NB1.res.sim)
+strong.ZIP.res.sim <- simulateResiduals(strong.ZIP.mdl)
+testOverdispersion(strong.ZIP.res.sim)
 ```
 
 
@@ -270,8 +288,149 @@ StrongBarDensity.plot
 ```
 
 
+
+## MODELING TAIL FAULT BARS
+
 ### Tail feather subset
 ```{r tail df subset}
 fb.tail.df <- subset(fb.df, Type == "tail")
 ```
 
+
+### Total tail fault bar poisson model
+```{r tot tail poisson mdl}
+tot.tail.poisson.mdl <- glmmTMB(data = fb.tail.df, TotalBars ~ Habitat, family = "poisson")
+```
+
+
+### Zero inflation test for tot.tail.poisson.mdl
+```{r DHARMa tot.tail fb zero inflation test}
+tot.tail.res.sim <- simulateResiduals(tot.tail.poisson.mdl)
+testZeroInflation(tot.tail.res.sim)
+```
+
+
+### Overdispersion test for tot.tail.poisson.mdl
+```{r tot.tail fb DHARMa overdispersion test}
+testOverdispersion(tot.tail.res.sim)
+```
+
+
+### Total tail fault bar zero inflated poisson model
+```{r tot.tail ZIP mdl}
+tot.tail.ZIP.mdl <- glmmTMB(data = fb.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Total tail fault bar model AIC comparison
+```{r tot.tail mdl AIC comparison}
+tot.tail.NB1.mdl <- update(tot.tail.ZIP.mdl, family = nbinom1)
+tot.tail.NB2.mdl <- update(tot.tail.ZIP.mdl, family = nbinom2)
+AICtab(tot.tail.ZIP.mdl, tot.tail.NB1.mdl, tot.tail.NB2.mdl)
+```
+
+
+### Best fit tot.tail model
+As per AIC comparison, negative binomial 1 model provides the best fit
+```{r tot.tail NB1 mdl}
+summary(tot.tail.NB1.mdl)
+```
+
+
+
+## MODELING SECONDARY FAULT BARS
+
+### Secondary feather subset
+```{r secondary df subset}
+fb.sec.df <- subset(fb.df, Type == "secondary")
+```
+
+
+### Total secondary fault bar poisson model
+```{r tot sec poisson mdl}
+tot.sec.poisson.mdl <- glmmTMB(data = fb.sec.df, TotalBars ~ Habitat, family = "poisson")
+```
+
+
+### Zero inflation test for tot.sec.poisson.mdl
+```{r DHARMa tot.sec fb zero inflation test}
+tot.sec.res.sim <- simulateResiduals(tot.sec.poisson.mdl)
+testZeroInflation(tot.sec.res.sim)
+```
+
+
+### Overdispersion test for tot.sec.poisson.mdl
+```{r tot.sec fb DHARMa overdispersion test}
+testOverdispersion(tot.sec.res.sim)
+```
+
+
+### Total secondary fault bar zero inflated poisson model
+```{r tot.sec ZIP mdl}
+tot.sec.ZIP.mdl <- glmmTMB(data = fb.sec.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Total tail fault bar model AIC comparison
+```{r tot.sec mdl AIC comparison}
+tot.sec.NB1.mdl <- update(tot.sec.ZIP.mdl, family = nbinom1)
+tot.sec.NB2.mdl <- update(tot.sec.ZIP.mdl, family = nbinom2)
+AICtab(tot.sec.poisson.mdl, tot.sec.ZIP.mdl, tot.sec.NB1.mdl, tot.sec.NB2.mdl)
+```
+
+
+### Best fit tot.sec model
+As per AIC comparison, negative binomial 1 model provides the best fit.
+Result is non significant
+```{r tot.sec NB1 mdl}
+summary(tot.sec.NB1.mdl)
+```
+
+
+
+## MODELING PRIMARY FAULT BARS
+
+### Primary feather subset
+```{r prim df subset}
+fb.prim.df <- subset(fb.df, Type == "primary")
+```
+
+
+### Total primary fault bar poisson model
+```{r tot prim poisson mdl}
+tot.prim.poisson.mdl <- glmmTMB(data = fb.prim.df, TotalBars ~ Habitat, family = "poisson")
+```
+
+
+### Zero inflation test for tot.prim.poisson.mdl
+```{r DHARMa tot.prim fb zero inflation test}
+tot.prim.res.sim <- simulateResiduals(tot.prim.poisson.mdl)
+testZeroInflation(tot.prim.res.sim)
+```
+
+
+### Overdispersion test for tot.prim.poisson.mdl
+```{r tot.prim fb DHARMa overdispersion test}
+testOverdispersion(tot.prim.res.sim)
+```
+
+
+### Total prim fault bar zero inflated poisson model
+```{r tot.prim ZIP mdl}
+tot.prim.ZIP.mdl <- glmmTMB(data = fb.prim.df, LightBars ~ Habitat, ziformula = ~1, family = "poisson")
+```
+
+
+### Total prim fault bar model AIC comparison
+```{r tot.prim mdl AIC comparison}
+tot.prim.NB1.mdl <- update(tot.prim.ZIP.mdl, family = nbinom1)
+tot.prim.NB2.mdl <- update(tot.prim.ZIP.mdl, family = nbinom2)
+AICtab(tot.prim.poisson.mdl, tot.prim.ZIP.mdl, tot.prim.NB1.mdl, tot.prim.NB2.mdl)
+```
+
+
+### Best fit tot.prim model
+As per AIC comparison, negative binomial 1 model provides the best fit
+```{r tot.prim NB1 mdl}
+summary(tot.prim.NB1.mdl)
+```
