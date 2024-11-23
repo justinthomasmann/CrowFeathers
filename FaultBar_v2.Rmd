@@ -29,6 +29,48 @@ n_occur <- data.frame(table(fb.df$ID))
 n_occur[n_occur$Freq > 1,]#no repeat IDs
 ```
 
+
+### Total fault bars by feather type model
+```{r total fb by ftype mdl}
+tot.type.mdl <- glmmTMB(data = fb.df, TotalBars ~ Type, family = "poisson")
+summary(tot.type.mdl)
+```
+
+
+### Zero inflation test for tot.type.mdl
+```{r DHARMa tot.type.mdl zero inflation test}
+tot.type.res.sim <- simulateResiduals(tot.type.mdl)
+testZeroInflation(tot.type.res.sim)
+```
+
+
+### Overdispersion test for tot.type.mdl
+```{r tot.type.mdl DHARMa overdispersion test}
+testOverdispersion(tot.type.res.sim)
+```
+
+
+### ZIP tot.type.mdl
+```{r ZIP tot.type.mdl}
+tot.type.ZIP.mdl <- glmmTMB(data = fb.df, TotalBars ~ Type, ziformula = ~1, family = "poisson")
+```
+
+
+### tot.type.mdl AIC comparison
+```{r tot.type.mdl AIC comparison}
+tot.type.NB1.mdl <- update(tot.type.ZIP.mdl, family = nbinom1)
+tot.type.NB2.mdl <- update(tot.type.ZIP.mdl, family = nbinom2)
+AICtab(tot.type.mdl,tot.type.ZIP.mdl,tot.type.NB1.mdl,tot.type.NB2.mdl)
+```
+
+
+### tot.type best fit model
+```{r tot.type best fit mdl}
+summary(tot.type.NB2.mdl)
+```
+
+
+
 ### Number of fault bars (>0) per feather type
 ```{r TotalBars by Type boxplot}
 fb.nozero.df <- fb.df %>% filter(TotalBars>0)
@@ -53,6 +95,8 @@ ggplot(data = fb.strong.nozero.df, aes(x=Type, y=StrongBars))+
   geom_boxplot(fill = palette.colors(n = 3, palette = "Tableau 10"))+
   ylab("Number of strong fault bars")
 ```
+
+
 
 ## MODELING TOTAL FAULT BARS
 
