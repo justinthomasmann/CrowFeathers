@@ -233,7 +233,7 @@ LightMeans <- c(mean(fb.df$LightBars[fb.df$Habitat=="urban"]),mean(fb.df$LightBa
 LightHabitatMeans <- data.frame(LightHabitat,LightMeans)
 
 LightBarDensity.plot <- ggplot(fb.df, aes(x=LightBars, fill = Habitat))+
-  geom_density(alpha=0.5)+
+  geom_histogram(color = "black")+
   geom_vline(data = LightHabitatMeans, aes(xintercept = LightMeans, color = LightHabitat),
              linetype="dashed",
              size = 1,
