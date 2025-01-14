@@ -273,12 +273,6 @@ TotalBarDensity.plot
 ### 4. Length of fault bar by Habitat
 
 
-```{r}
-type.mdl <- glmmTMB(data = fbs.df, LightPlusMedium ~ Type, ziformula= ~1, family = nbinom1)
-summary(type.mdl)
-```
-
-
 ```{r lpm poisson mdl}
 lpm.poisson.mdl <- glmmTMB(data = fbs.df, LightPlusMedium ~ Habitat, family = "poisson")
 ```
@@ -334,7 +328,7 @@ summary(glmmTMB(data = fbs.prim.df, BarsTotal ~ Habitat, ziformula = ~1, family 
 ### Primary feather light fault bar Poisson model
 Significantly fewer in urban habitat
 ```{r primary light fb poisson mdl}
-prim.light.poisson.mdl <- glmmTMB(data = fbs.prim.df, LightPlusMedium ~ Habitat, ziformula = ~1, family = nbinom1)
+prim.light.poisson.mdl <- glmmTMB(data = fbs.prim.df, LightBars ~ Habitat, family = "poisson")
 summary(prim.light.poisson.mdl)
 ```
 
