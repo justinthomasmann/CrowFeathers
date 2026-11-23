@@ -9,3 +9,25 @@ output: html_document
 data <- read.csv("feather_pca_test.csv", h=T)
 ```
 
+```{r}
+comp_data <- data[,1:5]
+
+pca_result <- prcomp(comp_data, center = T, scale. = T)
+summary(pca_result)
+```
+
+```{r}
+pca_result$rotation
+```
+```{r}
+biplot(pca_result)
+```
+```{r}
+library(ggplot2)
+pca_df <- data.frame(pca_result$x, FCode = as.factor(data$tail.code), Sex = data$sex)
+ggplot(pca_df, aes(x = PC1, y = PC2, color = Sex))+
+  geom_point(size = 2)+
+  stat_ellipse(level = 0.95)+
+  theme_minimal()
+```
+
