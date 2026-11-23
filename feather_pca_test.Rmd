@@ -1,0 +1,11 @@
+---
+title: "Crow Feather Shape Analyses"
+author: "Justin Mann"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+data <- read.csv("feather_pca_test.csv", h=T)
+```
+
