@@ -1,0 +1,20 @@
+---
+title: "Auburn Crow Feather Shape"
+format: html
+editor: visual
+---
+
+## Is feather shape in American Crows predictive of other age-related morphometrics?  
+
+### Libraries
+
+```{r}
+library(tidyverse)
+```
+
+### Data
+
+```{r}
+morph.df <- read.csv("AUBRCrowData.csv", h=T)
+fs.df <- read.csv("feather_pca_test.csv", h=T)
+```
